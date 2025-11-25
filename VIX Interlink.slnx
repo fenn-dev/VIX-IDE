@@ -1,0 +1,10 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="VIX Backend/VIX Backend.vcxproj" Id="96df34fb-9966-4bc3-8ec4-7f484bab53ed" />
+  <Project Path="VIX Bridge/VIX Bridge.vcxproj" Id="64d04d8c-be93-4009-8d96-9dc0bc0d7ca5" />
+  <Project Path="VIX Frontend/VIX Frontend.csproj" />
+</Solution>
