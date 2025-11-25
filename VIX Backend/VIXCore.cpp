@@ -1,6 +1,7 @@
 #include "../VIX Bridge/VIXBridge.h"
 #include <filesystem>
 #include <iostream>
+#include <string.h> // For memset
 
 namespace fs = std::filesystem;
 
@@ -17,6 +18,7 @@ namespace _VIX {
 
 
 namespace VIX {
+    // Non-Recursive Parser
     VFile* parseDirectory(const char* Path, size_t* outCount) {
         if (!fs::exists(Path)) {
             std::cerr << "Directory does not exist: " << Path << "\n";
@@ -33,6 +35,7 @@ namespace VIX {
             return nullptr;
         }
 
+        // Allocate array of VFile structs
         VFile* files = (VFile*)malloc(sizeof(VFile) * count);
         if (!files) {
             perror("malloc failed");
@@ -41,18 +44,18 @@ namespace VIX {
 
         size_t i = 0;
         for (auto& entry : fs::directory_iterator(Path)) {
-            VFile File = {};
+            VFile File = {}; // Zero-initializes struct
 
             File.isDirectory = entry.is_directory();
-            File.Children = nullptr;      // <-- important
-            File.ChildrenCount = 0;       // <-- important
+            File.Children = nullptr;      // No children for non-recursive
+            File.ChildrenCount = 0;        // No children for non-recursive
 
             File.Name = _VIX::Allocation(entry.path().filename().string().c_str());
             File.Extension = _VIX::Allocation(entry.path().extension().string().c_str());
             File.Path = _VIX::Allocation(entry.path().string().c_str());
 
             if (!File.Name || !File.Extension || !File.Path) {
-                perror("malloc failed");
+                perror("string allocation failed");
                 exit(EXIT_FAILURE);
             }
 
@@ -64,6 +67,7 @@ namespace VIX {
     }
 
 
+    // Recursive Parser
     VFile* parseDirectory_Recursive(const char* Path, size_t* outCount)
     {
         namespace fs = std::filesystem;
@@ -101,7 +105,7 @@ namespace VIX {
             f->Path = _VIX::Allocation(entry.path().string().c_str());
 
             if (!f->Name || !f->Extension || !f->Path) {
-                perror("malloc failed");
+                perror("string allocation failed");
                 exit(EXIT_FAILURE);
             }
 
@@ -109,6 +113,7 @@ namespace VIX {
             if (f->isDirectory)
             {
                 size_t childCount = 0;
+                // Recursive call returns an array of VFile structs
                 VFile* childArray = parseDirectory_Recursive(f->Path, &childCount);
 
                 f->ChildrenCount = (int)childCount;
@@ -118,7 +123,7 @@ namespace VIX {
                     // Allocate dynamic array of VFile* pointers
                     f->Children = (VFile**)malloc(sizeof(VFile*) * childCount);
 
-                    // Fill the pointer array
+                    // Fill the pointer array with addresses of VFile structs
                     for (size_t c = 0; c < childCount; ++c)
                     {
                         f->Children[c] = &childArray[c];
@@ -145,11 +150,11 @@ namespace VIX {
 }
 
 extern "C" {
-	VIX_EXPORT VFile* ParseDirectory(const char* Path, size_t* FileCount) {
-		return VIX::parseDirectory(Path, FileCount);
-	}
+    VIX_EXPORT VFile* ParseDirectory(const char* Path, size_t* FileCount) {
+        return VIX::parseDirectory(Path, FileCount);
+    }
 
     VIX_EXPORT VFile* ParseDirectory_Recursive(const char* Path, size_t* FileCount) {
-		return VIX::parseDirectory_Recursive(Path, FileCount);
-	}
+        return VIX::parseDirectory_Recursive(Path, FileCount);
+    }
 }

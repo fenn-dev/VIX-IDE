@@ -1,18 +1,28 @@
 ﻿using System;
 using Avalonia;
+using System.Runtime.InteropServices;
 
 namespace VIX_Frontend
 {
     internal sealed class Program
     {
-        // Initialization code. Don't use any Avalonia, third-party APIs or any
-        // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
-        // yet and stuff might break.
-        [STAThread]
-        public static void Main(string[] args) => BuildAvaloniaApp()
-            .StartWithClassicDesktopLifetime(args);
+        // Import the necessary function to create a new console
+        [DllImport("kernel32.dll")]
+        private static extern bool AllocConsole();
 
-        // Avalonia configuration, don't remove; also used by visual designer.
+        [STAThread]
+        public static void Main(string[] args)
+        {
+            // --- FIX START ---
+            // AllocConsole() is now called unconditionally, so it runs in both 
+            // Debug and Release configurations.
+            AllocConsole();
+            // --- FIX END ---
+
+            BuildAvaloniaApp()
+                .StartWithClassicDesktopLifetime(args);
+        }
+
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()

@@ -4,33 +4,61 @@
         xmlns:models="using:VIX_Frontend.ViewModels"
         x:Class="VIX_Frontend.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="VIX IDE">
+        Title="VIX IDE"
+        Background="#FF111115">
 
-	<DockPanel Background="#FF111115">
-		<Menu DockPanel.Dock="Top" Background="#FF252525" CornerRadius="8" Padding="3" Margin="5">
+	<!-- Define the overall structure -->
+	<!-- Rows: 0=Menu (Auto), 1=Main Content Area (*), 2=Splitter (Auto), 3=Console (Auto) -->
+	<!-- Columns: 0=Explorer (Auto), 1=Splitter (Auto), 2=Editor (*) -->
+	<Grid RowDefinitions="Auto,*,Auto,Auto" ColumnDefinitions="Auto,Auto,*">
+
+		<!-- ROW 0: Menu Bar (Spans all columns) -->
+		<Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+              Background="#FF252525" CornerRadius="8" Padding="3" Margin="5">
 			<MenuItem Header="File" CornerRadius="8" Background="#FF3c3c3c"/>
 		</Menu>
 
-		<Border DockPanel.Dock="Left" Width="250" Background="#FF252525" CornerRadius="8" Padding="3" Margin="5">
-			<StackPanel>
-				<TextBlock Text="Project Explorer" Margin="0,0,0,5"/>
-				<Button Content="Refresh" Command="{Binding RefreshCommand}" />
-				<TreeView ItemsSource="{Binding FileTree}">
-					<TreeView.DataTemplates>
-						<TreeDataTemplate DataType="models:FileItem" ItemsSource="{Binding Children}">
-							<TextBlock Text="{Binding Name}" />
-						</TreeDataTemplate>
-					</TreeView.DataTemplates>
-				</TreeView>
-			</StackPanel>
+		<!-- ROW 1, COL 0: Project Explorer (Left Pane, spans 2 rows to cover the space next to the console) -->
+		<Border Grid.Row="1" Grid.Column="0" Grid.RowSpan="3"
+                Background="#FF252525" CornerRadius="8" Padding="3" Margin="5">
+			<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+				<StackPanel>
+					<TextBlock Text="Project Explorer" Margin="0,0,0,5"/>
+					<Button Content="Refresh" Command="{Binding RefreshCommand}" />
+					<TreeView ItemsSource="{Binding FileTree}">
+						<TreeView.DataTemplates>
+							<TreeDataTemplate DataType="models:FileItem" ItemsSource="{Binding Children}">
+								<TextBlock Text="{Binding Name}" />
+							</TreeDataTemplate>
+						</TreeView.DataTemplates>
+					</TreeView>
+				</StackPanel>
+			</ScrollViewer>
 		</Border>
 
-		<Border DockPanel.Dock="Bottom" Height="150" Background="#FF252525" CornerRadius="8" Padding="3" Margin="5">
+		<!-- ROW 1, COL 1: Vertical GridSplitter (between Explorer and Editor area) -->
+		<GridSplitter
+            Grid.Row="1" Grid.Column="1" Grid.RowSpan="3"
+            Width="6" Background="Gray"
+            VerticalAlignment="Stretch" />
+
+		<!-- ROW 1, COL 2: Code Editor Area (Top Right Content) -->
+		<Border Grid.Row="1" Grid.Column="2"
+                Background="#FF252525" CornerRadius="8" Padding="3" Margin="5">
+			<TextBlock Text="Code Editor Area"/>
+		</Border>
+
+		<!-- ROW 2, COL 2: Horizontal GridSplitter (between Editor and Console) -->
+		<GridSplitter
+            Grid.Row="2" Grid.Column="2"
+            Height="6" Background="Gray"
+            HorizontalAlignment="Stretch" />
+
+		<!-- ROW 3, COL 2: Console / Output (Bottom Right Pane) -->
+		<Border Grid.Row="3" Grid.Column="2"
+                Background="#FF252525" CornerRadius="8" Padding="3" Margin="5">
 			<TextBlock Text="Console / Output"/>
 		</Border>
 
-		<Border Background="#FF252525" CornerRadius="8" Padding="3" Margin="5">
-			<TextBlock Text="Code Editor Area"/>
-		</Border>
-	</DockPanel>
+	</Grid>
 </Window>
