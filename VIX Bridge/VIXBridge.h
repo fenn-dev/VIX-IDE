@@ -3,13 +3,11 @@
 #include <stddef.h>
 
 #ifdef _WIN32
-#ifdef BUILD_VIX_BRIDGE
-#define VIX_API __declspec(dllexport)
+#define VIX_EXPORT __declspec(dllexport)   // building DLL
+#define VIX_IMPORT __declspec(dllimport)   // consuming DLL
 #else
-#define VIX_API __declspec(dllimport)
-#endif
-#else
-#define VIX_API
+#define VIX_EXPORT __attribute__((visibility("default")))  // GCC/Clang export
+#define VIX_IMPORT
 #endif
 
 #ifdef __cplusplus
@@ -23,7 +21,7 @@ extern "C" {
 		bool isDirectory;
 		
 		int ChildrenCount;
-		VFile* Children[100];
+		struct VFile_struct** Children;   // <-- dynamic array (pointer to array)
 
 	} VFile;
 

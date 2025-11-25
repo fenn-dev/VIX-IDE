@@ -19,4 +19,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\x64\Release\VIX Backend.dll">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>
